@@ -55,9 +55,9 @@ app.use((error, req, res, next) => {
 
 })
 
-
 app.get('/', (req, res) => {
-    res.send("server working")
+    res.setHeader("Access-Control-Allow-Credentials", "true")
+    res.send("Api running....")
 })
 
 app.use("/api", apiRoutes)
