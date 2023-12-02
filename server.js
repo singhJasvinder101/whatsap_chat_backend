@@ -26,6 +26,19 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use((req, res, next) => {
+    const allowedOrigins = [process.env.BACKEND_URL, process.env.CLIENT_URL];
+
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    app.options('*', cors(corsOptions));
+    next();
+});
+
+
 app.use((error, req, res, next) => {
     if (error && process.env.NODE_ENV === "development") {
         res.status(500).json({
