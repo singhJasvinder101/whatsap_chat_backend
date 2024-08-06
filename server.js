@@ -12,7 +12,7 @@ app.use(cookieParser())
 connectDB()
 
 
-const allowedOrigins = [process.env.BACKEND_URL, process.env.CLIENT_URL];
+const allowedOrigins = [process.env.BACKEND_URL, process.env.CLIENT_URL, process.env.NETWORK_URL];
 const corsOptions = {
     origin: function (origin, callback) {
         if (allowedOrigins.includes(origin) || !origin) {
@@ -27,7 +27,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
-    const allowedOrigins = [process.env.BACKEND_URL, process.env.CLIENT_URL];
+    const allowedOrigins = [process.env.BACKEND_URL, process.env.CLIENT_URL, process.env.NETWORK_URL];
     // const allowedOrigins = ['https://x-time-backend.vercel.app', 'https://x-chat-talks.netlify.app'];
 
     const origin = req.headers.origin;
@@ -71,7 +71,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server, {
     pingTimeout: 60000,
     cors: {
-        origin: process.env.CLIENT_URL
+        origin: [process.env.CLIENT_URL, process.env.NETWORK_URL],
     }
 })
 
@@ -90,10 +90,11 @@ io.on("connection", (socket) => {
     })
 
     socket.on("typing", (room) => {
-        console.log("typing in",room)
+        console.log("typing in", room)
         socket.to(room).emit("typing");
     });
     socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+    socket.on("status", ({ room, status }) => socket.in(room).emit(status));
 
     socket.on("new message", (newMessageRecieved) => {
         var chat = newMessageRecieved.chat

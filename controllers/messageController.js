@@ -41,8 +41,38 @@ const allMessages = async (req, res, next) => {
     }
 }
 
+const deleteMessage = async (req, res, next) => {
+    try {
+        const { messageId } = req.body;
+        if (!messageId) {
+            return res.status(500).send("Message Id is required")
+        }
+        await Message.findByIdAndDelete(messageId)
+        return res.json({ message: "Message Deleted" })
+    } catch (error) {
+        next(error)
+    }
+}
+const editMessage = async (req, res, next) => {
+    try {
+        const { messageId, newContent } = req.body;
+        console.log(messageId, newContent)
+        if (!messageId) {
+            return res.status(500).send("Message Id is required")
+        }
+        await Message.findByIdAndUpdate(messageId, {
+            content: newContent
+        })
+        return res.json({ message: "Message Edited" })
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     sendMessage,
-    allMessages
+    allMessages,
+    deleteMessage,
+    editMessage,
 }
 
